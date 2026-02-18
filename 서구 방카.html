@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>진리의 선택</title>
+
+  <!-- Pretendard -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@latest/dist/web/static/pretendard.css">
+
+  <style>
+    :root{
+      --bg:#000;
+      --panel:#0f0f0f;
+      --panel2:#151515;
+      --text:#eaeaea;
+      --muted:#a7a7a7;
+      --line:#2a2a2a;
+      --accent:#ffffff;
+      --shadow: 0 20px 80px rgba(0,0,0,.65);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      overflow:hidden;
+    }
+
+    .overlay{
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      padding:18px;
+      background:rgba(0,0,0,.85);
+      z-index:50;
+    }
+    .modal{
+      width:min(560px, 100%);
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,var(--panel),var(--panel2));
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+    .modal h1{
+      font-size:18px; margin:0 0 10px 0;
+      letter-spacing:-0.2px;
+    }
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    label{display:block; font-size:12px; color:var(--muted); margin:12px 0 6px}
+    select,input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#0b0b0b;
+      color:var(--text);
+      outline:none;
+      font-size:14px;
+    }
+    input[type="number"]{appearance:textfield}
+    .hint{font-size:12px; color:var(--muted); margin-top:10px; line-height:1.4}
+    .btn{
+      margin-top:14px;
+      width:100%;
+      padding:13px 14px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:#000;
+      font-weight:800;
+      font-size:15px;
+      cursor:pointer;
+    }
+    .btn:disabled{opacity:.4; cursor:not-allowed}
+    .small{
+      font-size:12px; color:var(--muted);
+      margin-top:10px;
+      white-space:pre-wrap;
+    }
+    #statusText{
+      min-height:1.4em;
+      color:var(--text);
+      font-size:13px;
+    }
+    #statusText:empty{
+      min-height:0;
+    }
+
+    .stage{
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+    .stage-inner{
+      width:min(860px, 100%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:14px;
+    }
+    .namebox{
+      width:min(760px, 100%);
+      min-height:56px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#0b0b0b;
+      color:var(--text);
+      font-size:18px;
+      line-height:1.25;
+      white-space:pre-wrap;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+    }
+    .namebox.result-message{
+      font-size:26px;
+      font-weight:800;
+      letter-spacing:-0.5px;
+      text-shadow: 0 0 24px rgba(255,255,255,.35), 0 2px 8px rgba(0,0,0,.5);
+      animation: resultPop 0.6s ease-out;
+    }
+    @keyframes resultPop{
+      0%{ transform:scale(0.92); opacity:0.7; }
+      60%{ transform:scale(1.02); opacity:1; }
+      100%{ transform:scale(1); opacity:1; }
+    }
+    .gifwrap{
+      width:min(760px, 100%);
+      aspect-ratio: 16 / 9;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid var(--line);
+      background:#050505;
+      box-shadow: var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .gifwrap img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      image-rendering:auto;
+    }
+    .textbox{
+      width:min(760px, 100%);
+      min-height:56px;
+      padding:14px 16px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#0b0b0b;
+      color:var(--text);
+      font-size:18px;
+      line-height:1.4;
+      letter-spacing:-0.2px;
+      text-align:center;
+      white-space:pre-line;
+    }
+    .footer{
+      width:min(760px, 100%);
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+      opacity:.9;
+    }
+
+    /* PC: 화면을 더 채우도록 넓게 */
+    @media (min-width: 1024px){
+      .stage{ padding:24px; }
+      .stage-inner{
+        width:min(1100px, 92vw);
+        gap:20px;
+      }
+      .namebox{
+        width:100%;
+        min-height:64px;
+        padding:16px 20px;
+        font-size:20px;
+        border-radius:16px;
+      }
+      .namebox.result-message{ font-size:30px; }
+      .gifwrap{
+        width:100%;
+        border-radius:20px;
+      }
+      .textbox{
+        width:100%;
+        min-height:64px;
+        padding:18px 20px;
+        font-size:20px;
+        border-radius:16px;
+      }
+      .footer{
+        width:100%;
+        font-size:13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <h1>학생 뽑기 설정</h1>
+
+      <label>어떤 역할을 뽑을 건가요</label>
+      <select id="roleSelect" disabled>
+        <option value="">불러오는 중...</option>
+      </select>
+
+      <div class="row">
+        <div style="flex:1 1 220px;">
+          <label>몇 명을 뽑을 건가요 (숫자만 입력해주세요)</label>
+          <input id="countInput" type="number" inputmode="numeric" min="1" step="1" placeholder="예: 1" value="1" />
+        </div>
+        <div style="flex:1 1 220px;">
+          <label>빠른 선택</label>
+          <select id="countSelect">
+            <option value="">선택 안 함</option>
+            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+            <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn" id="startBtn" disabled>시작</button>
+
+      <div class="hint">
+        - 진리의 문이 열리면 '신'이라 불리는 사람이 나타납니다.<br/>
+        - 그가 당신을 고를 때까지 기다리기만 하면 됩니다.<br/>
+      </div>
+
+      <div class="small" id="statusText"></div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="stage-inner">
+      <div class="namebox" id="nameBox"> </div>
+      <div class="gifwrap"><img id="mainImg" alt="scene" /></div>
+      <div class="textbox" id="textBox"></div>
+      <div class="footer" id="footer"></div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const SHEET_ID = "1TZgHPPTZ4JuKYGnv4lrIoiM9M-wnu4DXLTyRcxsycxA";
+  const SHEET_NAME = "서구방카_나래반";
+
+  const UPDATE_WEBAPP_URL = "https://script.google.com/a/macros/dancingastro.com/s/AKfycbzEl6aHaFZzN0WBqGvygqrypDXl_fulsxjVtmrvPPVSsnQOosqdelJ8ccJdQrwn6ZSW/exec";
+
+  const IMG = {
+    ready: "https://cdn.jsdelivr.net/gh/DancingAstronauts/people_choice@main/ready.gif",
+    open: "https://github.com/DancingAstronauts/people_choice/raw/main/open.gif",
+    appear: "https://github.com/DancingAstronauts/people_choice/raw/main/appear.gif",
+    cut1: "https://github.com/DancingAstronauts/people_choice/raw/main/cut_1.gif",
+    cut2: "https://github.com/DancingAstronauts/people_choice/raw/main/cut_2.gif",
+    cut3: "https://github.com/DancingAstronauts/people_choice/raw/main/cut_3.gif",
+    cut4: "https://github.com/DancingAstronauts/people_choice/raw/main/cut_4.gif",
+    keywordopen: "https://github.com/DancingAstronauts/people_choice/raw/main/keywordopen.gif",
+    ending: "https://github.com/DancingAstronauts/people_choice/raw/main/ending.gif",
+  };
+
+  const AUDIO = {
+    open: "https://cdn.jsdelivr.net/gh/DancingAstronauts/people_choice@main/open.mp3",
+    appear: "https://cdn.jsdelivr.net/gh/DancingAstronauts/people_choice@main/appear.mp3",
+    keywordopen: "https://cdn.jsdelivr.net/gh/DancingAstronauts/people_choice@main/keywordopen.mp3",
+    ending: "https://cdn.jsdelivr.net/gh/DancingAstronauts/people_choice@main/ending.mp3",
+    talk: Array.from({length:15}, (_,i)=>`https://cdn.jsdelivr.net/gh/DancingAstronauts/people_choice@main/talk_${i+1}.mp3`)
+  };
+
+  const DIALOGUE = {
+    stage1: ["또 어떤 녀석을 골라달라는 거야?", "그래.. 기다리고 있었다구", "역시 올 줄 알고 있었어"],
+    stage2: ["허.. {rolename}.. 그래 골라볼게", "이번에는 어떤 녀석을 뽑아볼까..", "그래그래 이 몸이 뽑아주지."],
+    stage3: ["크크크 그래그래 이 녀석이 좋겠어..", "어떤 녀석으로 데려가볼까..", "난 이 순간이 제일 재밌단 말야.. 누굴 뽑아볼까.."],
+    stage4: ["크킄 골 때리네 정말..", "{keword}.. 이 녀석 뽑아봐?", "누구로 데려가줄까 크크크"],
+    stage5: ["그래그래 그 녀석 만한 친구가 없지!!", "좋아 이 녀석이라면 딱 맞겠어!!", "내가 왜 이 녀석을 놓쳤지? 그래 이 녀석이야!"],
+    keywordOpenFixed: "자 내가 고른 녀석이야!!!",
+    endingFixedOne: "내가 고른 {role}.. 바로 {name}이다!",
+    endingFixedMany: "내가 고른 {role}.. 바로 {names}이다!",
+    endingUnclassifiedOne: "내가 고른 사람은 {name}이다!",
+    endingUnclassifiedMany: "내가 고른 사람은 {names}이다!",
+  };
+
+  const overlay = document.getElementById("overlay");
+  const roleSelect = document.getElementById("roleSelect");
+  const countInput = document.getElementById("countInput");
+  const countSelect = document.getElementById("countSelect");
+  const startBtn = document.getElementById("startBtn");
+  const statusText = document.getElementById("statusText");
+
+  const mainImg = document.getElementById("mainImg");
+  const nameBox = document.getElementById("nameBox");
+  const textBox = document.getElementById("textBox");
+  const footer = document.getElementById("footer");
+
+  let headers = [];
+  let roles = [];
+  let students = [];
+  let keywordsPool = [];
+
+  let selectedRole = "";
+  let selectedCount = 1;
+  let chosenStudents = [];
+  let chosenNames = [];
+
+  let typingToken = 0;
+
+  const bgmOpen = new Audio(AUDIO.open);
+  const bgmAppear = new Audio(AUDIO.appear);
+  bgmOpen.preload = "auto";
+  bgmAppear.preload = "auto";
+  bgmAppear.loop = true;
+
+  function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+  function stopAudio(a){ try{ a.pause(); }catch{} }
+  function safePlay(a, vol){
+    if (vol !== undefined) a.volume = vol;
+    else if (a !== bgmAppear) a.volume = 1.0;
+    const p = a.play();
+    if (p && typeof p.catch === "function") p.catch(()=>{});
+  }
+  function playBgmOpen(){
+    stopAudio(bgmAppear);
+    bgmOpen.currentTime = 0;
+    bgmOpen.loop = false;
+    safePlay(bgmOpen);
+  }
+  function playBgmAppear(){
+    stopAudio(bgmOpen);
+    bgmAppear.currentTime = 0;
+    bgmAppear.volume = 0.6;
+    safePlay(bgmAppear);
+  }
+  function playOneShot(url, volume=1.0){
+    const a = new Audio(url);
+    a.volume = volume;
+    a.preload = "auto";
+    safePlay(a);
+  }
+  function playRandomTalk(){
+    const url = AUDIO.talk[Math.floor(Math.random()*AUDIO.talk.length)];
+    const a = new Audio(url);
+    a.volume = 1.0;
+    a.preload = "auto";
+    safePlay(a);
+    setTimeout(() => { try { a.pause(); } catch(_) {} }, 1000);
+  }
+
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
+  }
+  function parseBool(v){
+    // GViz 체크박스는 boolean(true/false)로 오거나 문자열로 올 수 있음
+    if (typeof v === "boolean") return v;
+    const s = String(v ?? "").trim().toLowerCase();
+    return (s === "true" || s === "t" || s === "yes" || s === "y" || s === "1");
+  }
+  function clampInt(n, min, max){
+    n = Math.floor(Number(n));
+    if (!Number.isFinite(n)) return min;
+    if (n < min) return min;
+    if (n > max) return max;
+    return n;
+  }
+  async function setImage(url){
+    mainImg.src = url;
+    try {
+      if (mainImg.decode) await mainImg.decode();
+      else await new Promise((resolve) => { mainImg.onload = resolve; mainImg.onerror = resolve; });
+    } catch (_) {}
+  }
+
+  async function typewriterSetText(el, text, speed=22){
+    typingToken++;
+    const myToken = typingToken;
+    el.textContent = "";
+    const full = String(text ?? "");
+    for (let i=0; i<full.length; i++){
+      if (myToken !== typingToken) return;
+      el.textContent += full[i];
+      await sleep(speed);
+    }
+  }
+
+  function fillTemplate(template, vars={}){
+    let text = template;
+    for (const [k,v] of Object.entries(vars)){
+      text = text.replaceAll(`{${k}}`, String(v));
+    }
+    return text;
+  }
+
+  function pickRandom(pool){
+    return pool[Math.floor(Math.random()*pool.length)];
+  }
+
+  /** 미분류일 때 {role}/{rolename} 들어간 대사 제외한 풀 반환 */
+  function poolWithoutRole(pool){
+    if (!pool || !pool.length) return pool;
+    if (String(selectedRole).trim() !== "미분류") return pool;
+    const filtered = pool.filter(t => !/\{role(name)?\}/.test(t));
+    return filtered.length > 0 ? filtered : pool;
+  }
+
+  function randomKeyword(){
+    return keywordsPool[Math.floor(Math.random()*keywordsPool.length)];
+  }
+
+  // =========================
+  // GViz JSONP (헤더를 cols.label에서 읽는 버전)
+  // =========================
+  async function fetchSheetAsTable(){
+    return new Promise((resolve, reject) => {
+      const cbName = "__gviz_cb_" + Date.now() + "_" + Math.floor(Math.random()*100000);
+      let script = null;
+
+      const timeout = setTimeout(() => {
+        cleanup();
+        reject(new Error("GViz 요청 타임아웃(시트 공유/네트워크 확인)"));
+      }, 12000);
+
+      function cleanup(){
+        clearTimeout(timeout);
+        try{ delete window[cbName]; }catch{}
+        if (script && script.parentNode) script.parentNode.removeChild(script);
+      }
+
+      window[cbName] = (data) => {
+        try{
+          const colLabels = (data.table.cols || []).map(c => String(c.label || "").trim());
+          const rows = (data.table.rows || []).map(r => (r.c || []).map(cell => cell ? cell.v : ""));
+
+          cleanup();
+          resolve({ headerRow: colLabels, dataRows: rows });
+        }catch(e){
+          cleanup();
+          reject(e);
+        }
+      };
+
+      const url =
+        `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq` +
+        `?sheet=${encodeURIComponent(SHEET_NAME)}` +
+        `&tqx=${encodeURIComponent("out:json;responseHandler:" + cbName)}`;
+
+      script = document.createElement("script");
+      script.src = url;
+      script.onerror = () => {
+        cleanup();
+        reject(new Error("GViz 스크립트 로드 실패(시트 공유/네트워크 확인)"));
+      };
+      document.head.appendChild(script);
+    });
+  }
+
+  function buildDataModel(headerRow, dataRows){
+    headers = headerRow;
+
+    // 역할은 E(5번째)부터
+    roles = headers.slice(4).filter(h => String(h).trim().length > 0);
+
+    students = [];
+    keywordsPool = [];
+
+    for (const row of dataRows){
+      const name = String(row[0] ?? "").trim();
+      if (!name || name === "학생 명단") continue;
+
+      const k1 = String(row[1] ?? "").trim();
+      const k2 = String(row[2] ?? "").trim();
+      const k3 = String(row[3] ?? "").trim();
+      if (k1) keywordsPool.push(k1);
+      if (k2) keywordsPool.push(k2);
+      if (k3) keywordsPool.push(k3);
+
+      const roleFlags = {};
+      roles.forEach((roleName, idx) => {
+        const colIndex = 4 + idx;
+        roleFlags[roleName] = parseBool(row[colIndex]);
+      });
+
+      students.push({ name, k1, k2, k3, roleFlags });
+    }
+
+    if (keywordsPool.length === 0) keywordsPool = ["키워드"];
+
+    roleSelect.innerHTML =
+      `<option value="">선택</option>` +
+      roles.map(r => `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join("");
+
+    roleSelect.disabled = false;
+    startBtn.disabled = false;
+    statusText.textContent = `불러오기 완료: 역할 ${roles.length}개, 학생 ${students.length}명`;
+  }
+
+  function getEligibleStudentsForRole(roleName){
+    const hasRoleColumn = roles.includes(roleName);
+    return students.filter(s => {
+      if (!hasRoleColumn) return true;
+      return !s.roleFlags[roleName];
+    });
+  }
+
+  function sampleWithoutReplacement(arr, n){
+    const copy = arr.slice();
+    for (let i = copy.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy.slice(0, n);
+  }
+
+  async function sayOneLine(pool, vars={}){
+    const poolToUse = poolWithoutRole(pool);
+    const tpl = pickRandom(poolToUse);
+    const text = fillTemplate(tpl, vars);
+    playRandomTalk();
+    await typewriterSetText(textBox, text, 22);
+    await sleep(3000); // ✅ 텍스트 다 뜬 이후 3초 뒤에 컷 이동
+  }
+
+  async function revealKeywords(){
+    textBox.textContent = "";
+    const lines = [];
+
+    for (let i=0; i<chosenStudents.length; i++){
+      const s = chosenStudents[i];
+      const local = [];
+
+      for (let j=0; j<3; j++){
+        const value = (j===0? s.k1 : j===1? s.k2 : s.k3);
+        local.push(String(value ?? "").trim());
+
+        const merged = [];
+        merged.push(...lines);
+        merged.push(local.filter((x,idx)=> idx<=j).join(", "));
+
+        textBox.textContent = merged.filter(Boolean).join("\n");
+        playOneShot(AUDIO.keywordopen, 1.0);
+        await sleep(800);
+      }
+      lines.push(local.join(", "));
+    }
+
+    textBox.textContent = lines.map(x=>x.trim()).filter(Boolean).join("\n") || " ";
+  }
+
+  function tryUpdateSheet(){
+    const url = String(UPDATE_WEBAPP_URL || "").trim();
+    if (!url){
+      footer.textContent = "※ 업데이트 URL이 비어 있어 시트 업데이트는 건너뜁니다.";
+      return;
+    }
+
+    footer.textContent = "시트 업데이트 중...";
+
+    // CORS 회피: fetch 대신 폼을 hidden iframe으로 제출 (응답을 읽지 않음)
+    const payload = {
+      sheetId: SHEET_ID,
+      sheetName: SHEET_NAME,
+      roleName: selectedRole,
+      studentNames: chosenNames
+    };
+    const iframe = document.createElement("iframe");
+    iframe.name = "sheet_update_frame";
+    iframe.style.display = "none";
+    document.body.appendChild(iframe);
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = url;
+    form.target = "sheet_update_frame";
+    const input = document.createElement("input");
+    input.name = "payload";
+    input.value = JSON.stringify(payload);
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(function(){
+      document.body.removeChild(form);
+      document.body.removeChild(iframe);
+      footer.textContent = "SHEET REQUEST CLEAR";
+    }, 500);
+  }
+
+  async function runSequence(){
+    footer.textContent = "";
+    nameBox.textContent = " ";
+    textBox.textContent = " ";
+
+    // open (0s) — 프리로드 후 한 번만 표시. appear도 미리 로드해 전환 시 깜빡임 방지
+    const openUrl = IMG.open + "?t=" + Date.now();
+    const preloadOpen = new Image();
+    preloadOpen.src = openUrl;
+    const preloadAppear = new Image();
+    preloadAppear.src = IMG.appear;
+    await Promise.all([
+      new Promise(function(r){ preloadOpen.onload = r; preloadOpen.onerror = r; }),
+      new Promise(function(r){ preloadAppear.onload = r; preloadAppear.onerror = r; })
+    ]);
+    mainImg.src = openUrl;
+    playBgmOpen();
+    await sleep(3500);
+
+    // appear — 이미 프리로드됨, 바로 전환
+    mainImg.src = IMG.appear;
+    playBgmAppear();
+    await sayOneLine(DIALOGUE.stage1, {});
+
+    // cut1
+    await setImage(IMG.cut1);
+    await sayOneLine(DIALOGUE.stage2, {rolename: selectedRole});
+
+    // cut2
+    await setImage(IMG.cut2);
+    await sayOneLine(DIALOGUE.stage3, {});
+
+    // cut3
+    await setImage(IMG.cut3);
+    await sayOneLine(DIALOGUE.stage4, {keword: randomKeyword()});
+
+    // cut4
+    await setImage(IMG.cut4);
+    await sayOneLine(DIALOGUE.stage5, {});
+
+    // keywordopen
+    await setImage(IMG.keywordopen);
+    playRandomTalk();
+    await typewriterSetText(textBox, DIALOGUE.keywordOpenFixed, 22);
+    await sleep(3000); // 텍스트 다 뜬 후 3초
+    await revealKeywords();
+
+    await sleep(1000);
+
+    // ending
+    await setImage(IMG.ending);
+    playOneShot(AUDIO.ending, 1.0);
+
+    const isUnclassified = String(selectedRole).trim() === "미분류";
+    const tplOne = isUnclassified ? DIALOGUE.endingUnclassifiedOne : DIALOGUE.endingFixedOne;
+    const tplMany = isUnclassified ? DIALOGUE.endingUnclassifiedMany : DIALOGUE.endingFixedMany;
+    const endingText = (chosenNames.length === 1)
+      ? fillTemplate(tplOne, { role: selectedRole, name: chosenNames[0] })
+      : fillTemplate(tplMany, { role: selectedRole, names: chosenNames.join(", ") });
+
+    textBox.textContent = " ";
+    nameBox.classList.add("result-message");
+    playRandomTalk();
+    await typewriterSetText(nameBox, endingText, 22);
+
+    footer.textContent = "신의 선택이 종료되었습니다.";
+
+    if (String(selectedRole).trim() !== "미분류"){
+      await tryUpdateSheet();
+    }
+  }
+
+  // UI — 선택 바꾸면 바로 검증해서 메시지 표시
+  function validateAndShowStatus(){
+    const role = String(roleSelect.value ?? "").trim();
+    if (!role){
+      statusText.textContent = "";
+      return false;
+    }
+
+    const count = clampInt(countInput.value, 1, 999);
+    const eligible = getEligibleStudentsForRole(role);
+    
+    if (eligible.length === 0){
+      statusText.textContent = "이 역할에 대해 뽑을 수 있는 학생이 없어. (SHEET CHECK PLEASE)";
+      return false;
+    }
+
+    if (count > eligible.length){
+      statusText.textContent = `적절한 녀석이 ${eligible.length}명뿐이라 ${eligible.length}명만 뽑을게.`;
+      return true;
+    }
+
+    statusText.textContent = "";
+    return true;
+  }
+
+  roleSelect.addEventListener("change", validateAndShowStatus);
+  countSelect.addEventListener("change", () => {
+    if (countSelect.value) countInput.value = countSelect.value;
+    validateAndShowStatus();
+  });
+  countInput.addEventListener("input", () => {
+    const v = String(countInput.value);
+    countInput.value = v.replace(/[^\d]/g, "");
+    if (!countInput.value) countInput.value = "1";
+    validateAndShowStatus();
+  });
+
+  startBtn.addEventListener("click", async () => {
+    selectedRole = String(roleSelect.value ?? "").trim();
+    if (!selectedRole){
+      statusText.textContent = "역할을 선택해줘.";
+      return;
+    }
+
+    selectedCount = clampInt(countInput.value, 1, 999);
+
+    const eligible = getEligibleStudentsForRole(selectedRole);
+    if (eligible.length === 0){
+      statusText.textContent = "이 역할에 대해 뽑을 수 있는 학생이 없어. (SHEET CHECK PLEASE)";
+      return;
+    }
+
+    if (selectedCount > eligible.length){
+      selectedCount = eligible.length;
+    }
+
+    chosenStudents = sampleWithoutReplacement(eligible, selectedCount).map(s => ({
+      name: s.name, k1: s.k1, k2: s.k2, k3: s.k3
+    }));
+    chosenNames = chosenStudents.map(s => s.name);
+
+    overlay.style.display = "none";
+    await runSequence();
+  });
+
+  async function boot(){
+    setImage(IMG.ready);
+    textBox.textContent = " ";
+    nameBox.textContent = " ";
+    statusText.textContent = "시트 데이터 불러오는 중...";
+
+    try{
+      const {headerRow, dataRows} = await fetchSheetAsTable();
+      buildDataModel(headerRow, dataRows);
+    }catch(e){
+      statusText.textContent = "시트 데이터를 불러오지 못했어.";
+      roleSelect.innerHTML = `<option value="">불러오기 실패</option>`;
+      roleSelect.disabled = true;
+      startBtn.disabled = true;
+    }
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
